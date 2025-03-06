@@ -37,44 +37,63 @@
         <h2>Tech Stack Blog</h2>
         <div class="filter">
             <label for="date-filter">Filter by Date: </label>
-            <select id="date-filter" onchange="filterArticles()">
-                <option value="all">All Articles</option>
-                <option value="2025-03">March 2025</option>
-                <option value="2025-01">January 2025</option>
-                <option value="2024-12">December 2024</option>
-            </select>
+            <select id="date-filter" onchange="filterArticles()"></select>
         </div>
-        <div class="article" data-date="2025-03">
-            <h3>AI Evolution</h3>
-            <div class="byline">By: Terry Roy - March 2025</div>
-            <p>AI is evolving at an unprecedented rate. From natural language processing to autonomous systems, artificial intelligence is reshaping industries.</p>
+        <!-- Add new articles here daily with date and time -->
+        <div class="article" data-date="2025-03-06T16:45:00">
+            <h3>Today’s Tech Insight</h3>
+            <div class="byline">By: Terry Roy - March 6, 2025, 4:45 PM</div>
+            <p>AI advancements are accelerating this afternoon...</p>
         </div>
-        <div class="article" data-date="2025-01">
+        <div class="article" data-date="2025-03-05T11:20:00">
             <h3>Cloud Computing Trends</h3>
-            <div class="byline">By: Terry Roy - January 2025</div>
-            <p>The future belongs to those who understand trends in software development and cloud computing.</p>
+            <div class="byline">By: Terry Roy - March 5, 2025, 11:20 AM</div>
+            <p>The future of tech lies in the cloud...</p>
         </div>
-        <div class="article" data-date="2024-12">
-            <h3>Machine Learning in 2024</h3>
-            <div class="byline">By: Terry Roy - December 2024</div>
-            <p>A look at how machine learning shaped tech in 2024.</p>
+        <div class="article" data-date="2025-03-04T14:10:00">
+            <h3>AI Evolution</h3>
+            <div class="byline">By: Terry Roy - March 4, 2025, 2:10 PM</div>
+            <p>AI is evolving at an unprecedented rate...</p>
         </div>
     </section>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
+        function loadArticles() {
+            const articles = Array.from(document.querySelectorAll('.article'));
+            const filter = document.getElementById('date-filter');
+            const today = new Date().toISOString().split('T')[0]; // e.g., "2025-03-06"
+
+            articles.sort((a, b) => 
+                new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'))
+            );
+
+            articles.forEach(article => {
+                const date = article.getAttribute('data-date');
+                const option = document.createElement('option');
+                option.value = date;
+                option.text = new Date(date).toLocaleString('en-US', { 
+                    month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' 
+                });
+                filter.appendChild(option);
+            });
+
+            const todayArticle = articles.find(article => 
+                article.getAttribute('data-date').startsWith(today)
+            );
+            const defaultDate = todayArticle ? todayArticle.getAttribute('data-date') : articles[0].getAttribute('data-date');
+            filter.value = defaultDate;
+            filterArticles();
+        }
+
         function filterArticles() {
             const filterValue = document.getElementById('date-filter').value;
             const articles = document.querySelectorAll('.article');
             articles.forEach(article => {
-                if (filterValue === 'all' || article.getAttribute('data-date') === filterValue) {
-                    article.classList.add('active');
-                } else {
-                    article.classList.remove('active');
-                }
+                article.classList.toggle('active', article.getAttribute('data-date') === filterValue);
             });
         }
-        filterArticles();
-        document.getElementById('date-filter').value = 'all';
+
+        loadArticles();
     </script>
 </body>
 </html>

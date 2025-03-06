@@ -37,44 +37,63 @@
         <h2>Dose of Growth</h2>
         <div class="filter">
             <label for="date-filter">Filter by Date: </label>
-            <select id="date-filter" onchange="filterArticles()">
-                <option value="all">All Articles</option>
-                <option value="2025-03">March 2025</option>
-                <option value="2025-02">February 2025</option>
-                <option value="2024-10">October 2024</option>
-            </select>
+            <select id="date-filter" onchange="filterArticles()"></select>
         </div>
-        <div class="article" data-date="2025-03">
-            <h3>Rising Above</h3>
-            <div class="byline">By: Terry Roy - March 2025</div>
-            <p>Life’s greatest transformations come through struggle. Growth is a painful yet necessary process, a fire that refines the strongest metals.</p>
+        <!-- Add new articles here daily with date and time -->
+        <div class="article" data-date="2025-03-06T10:00:00">
+            <h3>Today’s Growth Tip</h3>
+            <div class="byline">By: Terry Roy - March 6, 2025, 10:00 AM</div>
+            <p>Embrace challenges as opportunities for growth today...</p>
         </div>
-        <div class="article" data-date="2025-02">
+        <div class="article" data-date="2025-03-05T13:45:00">
             <h3>Fuel for Growth</h3>
-            <div class="byline">By: Terry Roy - February 2025</div>
-            <p>Every setback is a lesson. Every failure is fuel. The only question is—how will you use it?</p>
+            <div class="byline">By: Terry Roy - March 5, 2025, 1:45 PM</div>
+            <p>Every setback is a lesson to fuel your journey...</p>
         </div>
-        <div class="article" data-date="2024-10">
-            <h3>Starting Strong</h3>
-            <div class="byline">By: Terry Roy - October 2024</div>
-            <p>Your future self depends on the work you do today. Keep pushing.</p>
+        <div class="article" data-date="2025-03-04T08:30:00">
+            <h3>Rising Above</h3>
+            <div class="byline">By: Terry Roy - March 4, 2025, 8:30 AM</div>
+            <p>Transformations come through struggle...</p>
         </div>
     </section>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
+        function loadArticles() {
+            const articles = Array.from(document.querySelectorAll('.article'));
+            const filter = document.getElementById('date-filter');
+            const today = new Date().toISOString().split('T')[0]; // e.g., "2025-03-06"
+
+            articles.sort((a, b) => 
+                new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'))
+            );
+
+            articles.forEach(article => {
+                const date = article.getAttribute('data-date');
+                const option = document.createElement('option');
+                option.value = date;
+                option.text = new Date(date).toLocaleString('en-US', { 
+                    month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' 
+                });
+                filter.appendChild(option);
+            });
+
+            const todayArticle = articles.find(article => 
+                article.getAttribute('data-date').startsWith(today)
+            );
+            const defaultDate = todayArticle ? todayArticle.getAttribute('data-date') : articles[0].getAttribute('data-date');
+            filter.value = defaultDate;
+            filterArticles();
+        }
+
         function filterArticles() {
             const filterValue = document.getElementById('date-filter').value;
             const articles = document.querySelectorAll('.article');
             articles.forEach(article => {
-                if (filterValue === 'all' || article.getAttribute('data-date') === filterValue) {
-                    article.classList.add('active');
-                } else {
-                    article.classList.remove('active');
-                }
+                article.classList.toggle('active', article.getAttribute('data-date') === filterValue);
             });
         }
-        filterArticles();
-        document.getElementById('date-filter').value = 'all';
+
+        loadArticles();
     </script>
 </body>
 </html>

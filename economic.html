@@ -37,44 +37,66 @@
         <h2>Economic Perspective</h2>
         <div class="filter">
             <label for="date-filter">Filter by Date: </label>
-            <select id="date-filter" onchange="filterArticles()">
-                <option value="all">All Articles</option>
-                <option value="2025-03">March 2025</option>
-                <option value="2025-01">January 2025</option>
-                <option value="2024-11">November 2024</option>
-            </select>
+            <select id="date-filter" onchange="filterArticles()"></select>
         </div>
-        <div class="article" data-date="2025-03">
-            <h3>Market Shifts in 2025</h3>
-            <div class="byline">By: Terry Roy - March 2025</div>
-            <p>The global economy is in a state of flux. Inflationary pressures, geopolitical uncertainty, and rapid technological advancements continue to shape markets. Investors and policymakers must navigate these shifting tides with both caution and innovation.</p>
+        <!-- Add new articles here daily with date and time -->
+        <div class="article" data-date="2025-03-06T14:30:00">
+            <h3>Today’s Market Pulse</h3>
+            <div class="byline">By: Terry Roy - March 6, 2025, 2:30 PM</div>
+            <p>The markets are shifting today due to new economic data released this morning...</p>
         </div>
-        <div class="article" data-date="2025-01">
+        <div class="article" data-date="2025-03-05T09:15:00">
             <h3>Inflation Outlook</h3>
-            <div class="byline">By: Terry Roy - January 2025</div>
-            <p>Understanding the economic landscape requires more than just data analysis—it demands an intuitive grasp of trends, human behavior, and financial strategy.</p>
+            <div class="byline">By: Terry Roy - March 5, 2025, 9:15 AM</div>
+            <p>Understanding the economic landscape requires a keen eye...</p>
         </div>
-        <div class="article" data-date="2024-11">
-            <h3>Economic Recap: Q4 2024</h3>
-            <div class="byline">By: Terry Roy - November 2024</div>
-            <p>A review of how global markets closed out 2024, with insights into what’s ahead.</p>
+        <div class="article" data-date="2025-03-04T16:00:00">
+            <h3>Market Recap</h3>
+            <div class="byline">By: Terry Roy - March 4, 2025, 4:00 PM</div>
+            <p>A look back at yesterday’s economic trends...</p>
         </div>
     </section>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
+        function loadArticles() {
+            const articles = Array.from(document.querySelectorAll('.article'));
+            const filter = document.getElementById('date-filter');
+            const today = new Date().toISOString().split('T')[0]; // e.g., "2025-03-06"
+
+            // Sort articles by date (newest first)
+            articles.sort((a, b) => 
+                new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'))
+            );
+
+            // Populate filter dropdown
+            articles.forEach(article => {
+                const date = article.getAttribute('data-date');
+                const option = document.createElement('option');
+                option.value = date;
+                option.text = new Date(date).toLocaleString('en-US', { 
+                    month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' 
+                });
+                filter.appendChild(option);
+            });
+
+            // Show today’s article if it exists, otherwise the latest
+            const todayArticle = articles.find(article => 
+                article.getAttribute('data-date').startsWith(today)
+            );
+            const defaultDate = todayArticle ? todayArticle.getAttribute('data-date') : articles[0].getAttribute('data-date');
+            filter.value = defaultDate;
+            filterArticles();
+        }
+
         function filterArticles() {
             const filterValue = document.getElementById('date-filter').value;
             const articles = document.querySelectorAll('.article');
             articles.forEach(article => {
-                if (filterValue === 'all' || article.getAttribute('data-date') === filterValue) {
-                    article.classList.add('active');
-                } else {
-                    article.classList.remove('active');
-                }
+                article.classList.toggle('active', article.getAttribute('data-date') === filterValue);
             });
         }
-        filterArticles();
-        document.getElementById('date-filter').value = 'all';
+
+        loadArticles();
     </script>
 </body>
 </html>
