@@ -14,9 +14,14 @@
         nav a.active { color: #e74c3c; font-weight: bold; border-bottom: 2px solid #e74c3c; }
         .content { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
         h2 { color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 0.5rem; font-size: 1.8rem; }
+        h3 { color: #2c3e50; font-family: 'Georgia', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
         .byline { font-size: 1rem; color: #777; margin-bottom: 1rem; }
         p { font-size: 1.1rem; color: #555; margin-bottom: 1rem; }
         footer { text-align: center; padding: 1.5rem; background-color: #2c3e50; color: #ecf0f1; font-size: 0.9rem; width: 100%; }
+        .filter { margin-bottom: 1rem; text-align: center; }
+        select { padding: 0.5rem; font-size: 1rem; }
+        .article { margin-bottom: 2rem; display: none; }
+        .article.active { display: block; }
     </style>
 </head>
 <body>
@@ -26,13 +31,50 @@
         <a href="economic.html">Economic Perspective</a>
         <a href="dose.html" class="active">Dose of Growth</a>
         <a href="tech.html">Tech Stack Blog</a>
+        <a href="about.html">About Us</a>
     </nav>
     <section class="content">
         <h2>Dose of Growth</h2>
-        <div class="byline">By: Terry Roy</div>
-        <p>Life’s greatest transformations come through struggle. Growth is a painful yet necessary process, a fire that refines the strongest metals. You are not defined by your past failures, but by your ability to rise from them.</p>
-        <p>Every setback is a lesson. Every failure is fuel. The only question is—how will you use it? Your future self depends on the work you do today. Keep pushing.</p>
+        <div class="filter">
+            <label for="date-filter">Filter by Date: </label>
+            <select id="date-filter" onchange="filterArticles()">
+                <option value="all">All Articles</option>
+                <option value="2025-03">March 2025</option>
+                <option value="2025-02">February 2025</option>
+                <option value="2024-10">October 2024</option>
+            </select>
+        </div>
+        <div class="article" data-date="2025-03">
+            <h3>Rising Above</h3>
+            <div class="byline">By: Terry Roy - March 2025</div>
+            <p>Life’s greatest transformations come through struggle. Growth is a painful yet necessary process, a fire that refines the strongest metals.</p>
+        </div>
+        <div class="article" data-date="2025-02">
+            <h3>Fuel for Growth</h3>
+            <div class="byline">By: Terry Roy - February 2025</div>
+            <p>Every setback is a lesson. Every failure is fuel. The only question is—how will you use it?</p>
+        </div>
+        <div class="article" data-date="2024-10">
+            <h3>Starting Strong</h3>
+            <div class="byline">By: Terry Roy - October 2024</div>
+            <p>Your future self depends on the work you do today. Keep pushing.</p>
+        </div>
     </section>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
+    <script>
+        function filterArticles() {
+            const filterValue = document.getElementById('date-filter').value;
+            const articles = document.querySelectorAll('.article');
+            articles.forEach(article => {
+                if (filterValue === 'all' || article.getAttribute('data-date') === filterValue) {
+                    article.classList.add('active');
+                } else {
+                    article.classList.remove('active');
+                }
+            });
+        }
+        filterArticles();
+        document.getElementById('date-filter').value = 'all';
+    </script>
 </body>
 </html>
