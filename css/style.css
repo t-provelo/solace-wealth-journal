@@ -1,0 +1,142 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #F9F9F9; /* Soft light background for warmth */
+    color: #333333; /* Dark gray text for readability */
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: #FF7043; /* Warm accent color for links */
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #FF5722; /* Lighter coral on hover */
+    text-decoration: underline;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 50px;
+    background-color: #2C3E50; /* Deep blue for trust and professionalism */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #FF7043; /* Warm orange for a welcoming vibe */
+}
+
+header nav {
+    display: flex;
+}
+
+header nav a {
+    margin: 0 20px;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #F9F9F9; /* Light text for contrast */
+}
+
+header nav a:hover {
+    color: #FF5722; /* Light coral for hover effect */
+}
+
+main {
+    margin-top: 120px; /* Space for fixed header */
+    padding: 50px;
+    text-align: center;
+}
+
+.blog-entry {
+    background-color: #FFFFFF; /* White for blog post background */
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    width: 60%;
+    margin: 20px auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.blog-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.blog-entry h2 {
+    font-size: 2.8em;
+    color: #2C3E50; /* Deep blue for headings */
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.blog-entry p {
+    font-size: 1.2em;
+    color: #555555; /* Slightly lighter gray for paragraph text */
+    line-height: 1.8;
+}
+
+.blog-entry .author {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #999999; /* Lighter gray for author attribution */
+    margin-top: 20px;
+}
+
+footer {
+    padding: 40px 0;
+    background-color: #2C3E50; /* Blue footer for consistency */
+    color: #999999; /* Light gray footer text */
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 50px;
+}
+
+footer a {
+    color: #FF7043; /* Warm orange for footer links */
+}
+
+footer a:hover {
+    color: #FF5722; /* Light coral on hover */
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
+    }
+
+    header nav a {
+        font-size: 1em;
+    }
+
+    .blog-entry {
+        width: 90%;
+    }
+
+    main {
+        padding: 20px;
+    }
+}
