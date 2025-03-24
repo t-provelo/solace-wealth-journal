@@ -1,6 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, addDoc, getDocs } = require('firebase/firestore');
-const notify = require('./notify');
+const { getFirestore, collection, addDoc } = require('firebase/firestore');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDCgmDCNY4VOnZyKdZQGvfnTlULzcBRMXU",
@@ -21,7 +20,7 @@ exports.handler = async (event) => {
     const { title, content, date, category, archiveOld = false } = JSON.parse(event.body);
     console.log('Parsed content:', content);
 
-    const validCategories = ['home', 'economic', 'growth', 'tech', 'about'];
+    const validCategories = ['home', 'economic', 'growth', 'tech'];
     if (!validCategories.includes(category)) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Invalid category' }) };
     }
@@ -29,12 +28,8 @@ exports.handler = async (event) => {
     const docRef = await addDoc(collection(db, 'articles'), { title, content, date, category, archived: false });
     console.log('Added article ID:', docRef.id);
 
-    const subscribersSnapshot = await getDocs(collection(db, 'subscribers'));
-    const subscribers = subscribersSnapshot.docs.map(doc => doc.data().email);
-    console.log('Subscribers:', subscribers);
-    await notify.handler({ body: JSON.stringify({ subscribers, title, content }) });
-
-    return { statusCode: 200, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
+    // Notifications removed from here - will handle separately on deploy
+    return { statusCode: 200, body: JSON.stringify({ message: 'Article added' }) };
   } catch (error) {
     console.error('Error:', error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };

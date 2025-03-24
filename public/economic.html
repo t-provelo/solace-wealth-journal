@@ -12,15 +12,14 @@
         nav a { color: #ecf0f1; text-decoration: none; margin: 0 1.5rem; font-size: 1.1rem; transition: color 0.3s ease, transform 0.2s ease; }
         nav a:hover { color: #e74c3c; transform: scale(1.1); }
         .content { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .subscription { text-align: center; margin: 2rem auto; }
-        .subscription h3 { color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 1rem; }
-        .subscription input { padding: 0.5rem; font-size: 1rem; width: 200px; }
-        .subscription button { padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; cursor: pointer; }
         footer { text-align: center; padding: 1.5rem; background-color: #2c3e50; color: #ecf0f1; font-size: 0.9rem; width: 100%; }
         .articles { margin-top: 2rem; }
-        .article { border-bottom: 1px solid #ddd; padding: 1rem 0; }
-        .article h3 { color: #2c3e50; }
-        .filter { margin: 1rem 0; }
+        .article { padding: 1rem 0; text-align: center; }
+        .article h3 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .article .author { font-style: italic; margin-bottom: 0.5rem; }
+        .article .text { white-space: pre-wrap; line-height: 2; margin-bottom: 1rem; text-align: left; }
+        .article .date { font-size: 0.9rem; color: #666; }
+        .filter { text-align: center; margin: 1rem 0; }
     </style>
 </head>
 <body>
@@ -30,25 +29,19 @@
         <a href="/economic.html">Economic Perspective</a>
         <a href="/dose.html">Dose of Growth</a>
         <a href="/tech.html">Tech Knowledge</a>
-        <a href="/about.html">About Us</a>
+    
     </nav>
     <section class="content">
-        <h2>Economic Perspective</h2>
-        <p>Insights into markets, trends, and financial strategies.</p>
         <div class="filter">
             <label for="dateFilter">Filter by Date: </label>
-            <select id="dateFilter">
-                <option value="">All Dates</option>
-            </select>
+            <select id="dateFilter"></select>
         </div>
         <div class="articles" id="articleList"></div>
     </section>
-   
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
         const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
         const category = 'economic';
-
 
         async function loadArticles() {
             try {
@@ -76,15 +69,21 @@
                         .forEach(article => {
                             const div = document.createElement('div');
                             div.className = 'article';
-                            div.innerHTML = `<h3>${article.title}</h3><p>${article.content}</p><small>${article.date}</small>`;
+                            div.innerHTML = `
+                                <h3>${article.title}</h3>
+                                <div class="author">By: Terry Roy</div>
+                                <div class="text">${article.content}</div>
+                                <div class="date">${article.date}</div>
+                            `;
                             articleList.appendChild(div);
                         });
                 }
 
-                renderArticles('');
+                renderArticles(dates[0]);
+                dateFilter.value = dates[0];
                 dateFilter.addEventListener('change', (e) => renderArticles(e.target.value));
             } catch (error) {
-                console.error('Error loading articles:', error);
+                console.error('Fetch error:', error);
             }
         }
 
