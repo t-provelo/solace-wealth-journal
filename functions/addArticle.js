@@ -1,58 +1,23 @@
-const sqlite3 = require('sqlite3').verbose();
-const nodemailer = require('nodemailer');
+const Database = require('better-sqlite3');
 const path = require('path');
+const notify = require('./notify');
 
 exports.handler = async (event) => {
-  const db = new sqlite3.Database(path.join(__dirname, 'articles.db')); // Fixed path
+  const db = new Database(path.join(__dirname, 'articles.db'));
   const { title, content, date } = JSON.parse(event.body);
 
-  await new Promise((resolve) => {
-    db.run(`CREATE TABLE IF NOT EXISTS articles (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      content TEXT,
-      date TEXT
-    )`, resolve);
-  });
+  db.exec(`CREATE TABLE IF NOT EXISTS articles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT,
+    content TEXT,
+    date TEXT
+  )`);
 
-  await new Promise((resolve, reject) => {
-    db.run(`INSERT INTO articles (title, content, date) VALUES (?, ?, ?)`,
-      [title, content, date],
-      (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-  });
+  db.prepare(`INSERT INTO articles (title, content, date) VALUES (?, ?, ?)`).run(title, content, date);
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'tennardxterry@gmail.com',
-      pass: 'gqzjubheasecdyho'
-    }
-  });
-
-  const subscribers = await new Promise((resolve) => {
-    db.all(`SELECT email FROM subscribers`, (err, rows) => {
-      if (err) resolve([]);
-      resolve(rows);
-    });
-  });
-
-  const mailOptions = {
-    from: 'tennardxterry@gmail.com',
-    subject: `New Article: ${title}`,
-    text: `Check out the new article at https://theroycollection.com!`
-  };
-
-  try {
-    await Promise.all(subscribers.map(sub => 
-      transporter.sendMail({ ...mailOptions, to: sub.email })
-    ));
-  } catch (error) {
-    console.error('Notification failed:', error.message);
-  }
-
+  const subscribers = db.prepare(`SELECT email FROM subscribers`).all();
   db.close();
-  return { statusCode: 201, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
+
+  await notify.handler({ body: JSON.stringify({ subscribers: subscribers.map(s => s.email), title, content }) });
+  return { statusCode: 200, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
 };
