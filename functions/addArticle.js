@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, addDoc } = require('firebase/firestore');
+const { getFirestore, collection, addDoc, getDocs } = require('firebase/firestore');
 const notify = require('./notify');
 
 const firebaseConfig = {
@@ -16,13 +16,27 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 exports.handler = async (event) => {
-  const { title, content, date } = JSON.parse(event.body);
+  try {
+    console.log('Raw event body:', event.body);
+    const { title, content, date, category, archiveOld = false } = JSON.parse(event.body);
+    console.log('Parsed content:', content);
 
-  await addDoc(collection(db, 'articles'), { title, content, date });
+    const validCategories = ['home', 'economic', 'growth', 'tech', 'about'];
+    if (!validCategories.includes(category)) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid category' }) };
+    }
 
-  const subscribersSnapshot = await getDocs(collection(db, 'subscribers'));
-  const subscribers = subscribersSnapshot.docs.map(doc => doc.data().email);
+    const docRef = await addDoc(collection(db, 'articles'), { title, content, date, category, archived: false });
+    console.log('Added article ID:', docRef.id);
 
-  await notify.handler({ body: JSON.stringify({ subscribers, title, content }) });
-  return { statusCode: 200, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
+    const subscribersSnapshot = await getDocs(collection(db, 'subscribers'));
+    const subscribers = subscribersSnapshot.docs.map(doc => doc.data().email);
+    console.log('Subscribers:', subscribers);
+    await notify.handler({ body: JSON.stringify({ subscribers, title, content }) });
+
+    return { statusCode: 200, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
+  } catch (error) {
+    console.error('Error:', error);
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
 };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roy Collection</title>
+    <title>Economic Perspective - Roy Collection</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; color: #333; line-height: 1.6; }
@@ -20,6 +20,7 @@
         .articles { margin-top: 2rem; }
         .article { border-bottom: 1px solid #ddd; padding: 1rem 0; }
         .article h3 { color: #2c3e50; }
+        .filter { margin: 1rem 0; }
     </style>
 </head>
 <body>
@@ -32,38 +33,22 @@
         <a href="/about.html">About Us</a>
     </nav>
     <section class="content">
-        <h2>Welcome</h2>
-        <p>Explore articles on economics, personal growth, and technology.</p>
+        <h2>Economic Perspective</h2>
+        <p>Insights into markets, trends, and financial strategies.</p>
+        <div class="filter">
+            <label for="dateFilter">Filter by Date: </label>
+            <select id="dateFilter">
+                <option value="">All Dates</option>
+            </select>
+        </div>
         <div class="articles" id="articleList"></div>
     </section>
-    <div class="subscription">
-        <h3>Get Updates</h3>
-        <form id="subscribeForm">
-            <input type="email" id="emailInput" placeholder="Enter your email" required>
-            <button type="submit">Subscribe</button>
-        </form>
-    </div>
+   
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
         const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
-        const category = 'home';
+        const category = 'economic';
 
-        document.getElementById('subscribeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInput').value;
-            try {
-                const response = await fetch(`${apiBase}/.netlify/functions/subscribe`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                const result = await response.json();
-                alert(result.message || 'Error subscribing');
-                if (response.ok) document.getElementById('emailInput').value = '';
-            } catch (error) {
-                alert('Failed to subscribe: ' + error.message);
-            }
-        });
 
         async function loadArticles() {
             try {
@@ -73,15 +58,31 @@
                     body: JSON.stringify({ category })
                 });
                 const articles = await response.json();
+                const dateFilter = document.getElementById('dateFilter');
                 const articleList = document.getElementById('articleList');
 
-                articleList.innerHTML = '';
-                articles.forEach(article => {
-                    const div = document.createElement('div');
-                    div.className = 'article';
-                    div.innerHTML = `<h3>${article.title}</h3><p>${article.content}</p><small>${article.date}</small>`;
-                    articleList.appendChild(div);
+                const dates = [...new Set(articles.map(a => a.date))].sort().reverse();
+                dates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = date;
+                    dateFilter.appendChild(option);
                 });
+
+                function renderArticles(filterDate) {
+                    articleList.innerHTML = '';
+                    articles
+                        .filter(a => !filterDate || a.date === filterDate)
+                        .forEach(article => {
+                            const div = document.createElement('div');
+                            div.className = 'article';
+                            div.innerHTML = `<h3>${article.title}</h3><p>${article.content}</p><small>${article.date}</small>`;
+                            articleList.appendChild(div);
+                        });
+                }
+
+                renderArticles('');
+                dateFilter.addEventListener('change', (e) => renderArticles(e.target.value));
             } catch (error) {
                 console.error('Error loading articles:', error);
             }

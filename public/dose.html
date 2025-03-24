@@ -11,44 +11,84 @@
         nav { background-color: #34495e; padding: 1rem; text-align: center; }
         nav a { color: #ecf0f1; text-decoration: none; margin: 0 1.5rem; font-size: 1.1rem; transition: color 0.3s ease, transform 0.2s ease; }
         nav a:hover { color: #e74c3c; transform: scale(1.1); }
-        nav a.active { color: #e74c3c; font-weight: bold; border-bottom: 2px solid #e74c3c; }
         .content { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        h2 { color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 1rem; font-size: 2rem; text-align: center; }
-        h3 { color: #2c3e50; font-family: 'Georgia', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
-        .byline { font-size: 1rem; color: #777; margin-bottom: 1rem; text-align: center; }
-        p { font-size: 1.1rem; color: #555; margin-bottom: 1rem; }
         footer { text-align: center; padding: 1.5rem; background-color: #2c3e50; color: #ecf0f1; font-size: 0.9rem; width: 100%; }
-        .article { margin-bottom: 2rem; }
+        .articles { margin-top: 2rem; }
+        .article { padding: 1rem 0; text-align: center; } /* Center everything */
+        .article h3 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .article .author { font-style: italic; margin-bottom: 0.5rem; }
+        .article .text { white-space: pre-wrap; line-height: 2; margin-bottom: 1rem; text-align: left; } /* Left-align text */
+        .article .date { font-size: 0.9rem; color: #666; }
+        .filter { text-align: center; margin: 1rem 0; }
     </style>
 </head>
 <body>
-    <header>The Roy Collection</header>
+    <header>Roy Collection</header>
     <nav>
-        <a href="index.html">Home</a>
-        <a href="economic.html">Economic Perspective</a>
-        <a href="dose.html" class="active">Dose of Growth</a>
-        <a href="tech.html">Tech Knowledge</a>
-        <a href="about.html">About Us</a>
+        <a href="/">Home</a>
+        <a href="/economic.html">Economic Perspective</a>
+        <a href="/dose.html">Dose of Growth</a>
+        <a href="/tech.html">Tech Knowledge</a>
+        <a href="/about.html">About Us</a>
     </nav>
     <section class="content">
-        <h2>Power of Perspective</h2>
-        <div class="article">
-            <div class="byline">By: Terry Roy - Published on March 19, 2025</div>
-            <p>The world doesn’t exist as it is. It exists as you see it. Two people can live through the same experience and walk away with entirely different realities—one feeling broken, the other feeling enlightened. The difference isn’t in what happened. It’s in how it was perceived.</p>
-            <p>Most people go through life believing their thoughts are merely reactions to the world around them. They see circumstances as fixed, emotions as inevitable responses, and their position in life as a consequence of things outside their control. But the truth is, the way you see the world isn’t a reflection of reality—it’s a reflection of you. Your fears, your biases, your beliefs all shape the way you interpret events, and that interpretation dictates how you feel and what you do next.</p>
-            <p>Imagine two people lose their jobs on the same day. One spirals into hopelessness, seeing it as a sign of failure, proof that the world is unfair, that they were never good enough in the first place. The other sees it as a necessary redirection, an opportunity to finally pursue something greater. Same event, opposite realities.</p>
-            <p>It’s not about toxic positivity or pretending everything is fine when it’s not. It’s about the ability to step back and ask yourself, What else could this mean? What if the thing that feels like a dead end is actually a door? What if the setback is preparation for something you can’t yet see?</p>
-            <p>Perspective is a choice, and that choice determines the life you live. The moment you take control of how you interpret your circumstances, you take control of your future. You stop being a passive participant in your own life, dictated by events and emotions, and you become the architect of your reality.</p>
-            <p>Life will always present you with challenges, but your perspective determines whether those challenges are walls or stepping stones. Change your mind, and you’ll change your world.</p>
-            <p>So how do you change your perspective? These are some pointers that are helping me, warning this is not easy at all.</p>
-            <p>First, become aware of your default thoughts. The way you currently interpret life is a habit—one you may not even realize you have. Start paying attention to how you respond to situations. Do you immediately assume the worst? Do you look for problems instead of possibilities? Awareness is the first step to change.</p>
-            <p>Second, challenge your own narrative. Just because you believe something doesn’t make it true. If you think, I’m not good enough, ask yourself, According to who? If you think, This is the end of the road for me, ask yourself, Or is this the beginning of something new? Don’t accept your first reaction as fact.</p>
-            <p>Third, expose yourself to new perspectives. Read books, listen to people who have overcome struggles, engage with those who think differently than you. The more perspectives you see, the more you realize that your way of seeing the world isn’t the only way.</p>
-            <p>Fourth, practice gratitude, even when it’s hard. Gratitude shifts focus from what’s missing to what’s present. It rewires your brain to recognize opportunity rather than lack. It doesn’t mean ignoring hardship, but it means refusing to let hardship define your entire outlook.</p>
-            <p>Finally, act as if the new perspective is already yours. Even if you don’t fully believe it yet, start behaving like you do. If you want to see challenges as opportunities, start treating them that way. If you want to believe in yourself, start acting like someone who does. Your mind will follow where your actions lead.</p>
-            <p>Changing perspective isn’t about denying reality. It’s about taking control of how reality affects you. Your life is only as limited as the lens you see it through. Shift the lens, and you shift your entire world.</p>
+        <div class="filter">
+            <label for="dateFilter">Filter by Date: </label>
+            <select id="dateFilter"></select>
         </div>
+        <div class="articles" id="articleList"></div>
     </section>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
+    <script>
+        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+        const category = 'growth';
+
+        async function loadArticles() {
+            try {
+                const response = await fetch(`${apiBase}/.netlify/functions/getArticles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category })
+                });
+                const articles = await response.json();
+                const dateFilter = document.getElementById('dateFilter');
+                const articleList = document.getElementById('articleList');
+
+                const dates = [...new Set(articles.map(a => a.date))].sort().reverse();
+                dates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = date;
+                    dateFilter.appendChild(option);
+                });
+
+                function renderArticles(filterDate) {
+                    articleList.innerHTML = '';
+                    articles
+                        .filter(a => !filterDate || a.date === filterDate)
+                        .forEach(article => {
+                            const div = document.createElement('div');
+                            div.className = 'article';
+                            div.innerHTML = `
+                                <h3>${article.title}</h3>
+                                <div class="author">By: Terry Roy</div>
+                                <div class="text">${article.content}</div>
+                                <div class="date">${article.date}</div>
+                            `;
+                            articleList.appendChild(div);
+                        });
+                }
+
+                // Default to the latest date (today)
+                renderArticles(dates[0]);
+                dateFilter.value = dates[0];
+                dateFilter.addEventListener('change', (e) => renderArticles(e.target.value));
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        loadArticles();
+    </script>
 </body>
 </html>

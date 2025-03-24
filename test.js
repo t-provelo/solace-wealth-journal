@@ -6,7 +6,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Respond to preflight with 200
+    return res.status(200).end();
   }
   next();
 });
@@ -16,6 +16,7 @@ app.use(express.json());
 const addArticle = require('./functions/addArticle');
 const subscribe = require('./functions/subscribe');
 const notify = require('./functions/notify');
+const getArticles = require('./functions/getArticles');
 
 const adaptHandler = (handler) => {
   return (req, res) => {
@@ -39,5 +40,6 @@ const adaptHandler = (handler) => {
 app.use('/.netlify/functions/addArticle', adaptHandler(addArticle.handler));
 app.use('/.netlify/functions/subscribe', adaptHandler(subscribe.handler));
 app.use('/.netlify/functions/notify', adaptHandler(notify.handler));
+app.use('/.netlify/functions/getArticles', adaptHandler(getArticles.handler));
 
 app.listen(3000, () => console.log('Test server on port 3000'));
