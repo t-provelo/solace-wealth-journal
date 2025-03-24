@@ -1,23 +1,28 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, getDocs, addDoc } = require('firebase/firestore');
 const notify = require('./notify');
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDCgmDCNY4VOnZyKdZQGvfnTlULzcBRMXU",
+  authDomain: "roy-collection-6d136.firebaseapp.com",
+  projectId: "roy-collection-6d136",
+  storageBucket: "roy-collection-6d136.firebasestorage.app",
+  messagingSenderId: "539781423883",
+  appId: "1:539781423883:web:2d67d4dcc1cc0d94a9780e",
+  measurementId: "G-HNHC911W9D"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 exports.handler = async (event) => {
-  const db = new Database(path.join(__dirname, 'articles.db'));
   const { title, content, date } = JSON.parse(event.body);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS articles (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    content TEXT,
-    date TEXT
-  )`);
+  await addDoc(collection(db, 'articles'), { title, content, date });
 
-  db.prepare(`INSERT INTO articles (title, content, date) VALUES (?, ?, ?)`).run(title, content, date);
+  const subscribersSnapshot = await getDocs(collection(db, 'subscribers'));
+  const subscribers = subscribersSnapshot.docs.map(doc => doc.data().email);
 
-  const subscribers = db.prepare(`SELECT email FROM subscribers`).all();
-  db.close();
-
-  await notify.handler({ body: JSON.stringify({ subscribers: subscribers.map(s => s.email), title, content }) });
+  await notify.handler({ body: JSON.stringify({ subscribers, title, content }) });
   return { statusCode: 200, body: JSON.stringify({ message: 'Article added and subscribers notified' }) };
 };

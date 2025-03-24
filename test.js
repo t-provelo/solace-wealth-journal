@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
 
-// Add CORS middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Allow all origins (adjust for production)
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', 'POST');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // Respond to preflight with 200
+  }
   next();
 });
 

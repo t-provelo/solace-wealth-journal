@@ -1,25 +1,30 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, query, where, getDocs, addDoc } = require('firebase/firestore');
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCgmDCNY4VOnZyKdZQGvfnTlULzcBRMXU",
+  authDomain: "roy-collection-6d136.firebaseapp.com",
+  projectId: "roy-collection-6d136",
+  storageBucket: "roy-collection-6d136.firebasestorage.app",
+  messagingSenderId: "539781423883",
+  appId: "1:539781423883:web:2d67d4dcc1cc0d94a9780e",
+  measurementId: "G-HNHC911W9D"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 exports.handler = async (event) => {
-  const db = new Database(path.join(__dirname, 'articles.db'));
   const { email } = JSON.parse(event.body);
 
-  // Create table if it doesn’t exist
-  db.exec(`CREATE TABLE IF NOT EXISTS subscribers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE
-  )`);
+  const subscribersRef = collection(db, 'subscribers');
+  const q = query(subscribersRef, where('email', '==', email));
+  const querySnapshot = await getDocs(q);
 
-  // Check if email exists
-  const exists = db.prepare(`SELECT email FROM subscribers WHERE email = ?`).get(email);
-  if (exists) {
-    db.close();
+  if (!querySnapshot.empty) {
     return { statusCode: 200, body: JSON.stringify({ message: 'Already subscribed' }) };
   }
 
-  // Insert new email
-  db.prepare(`INSERT INTO subscribers (email) VALUES (?)`).run(email);
-  db.close();
+  await addDoc(subscribersRef, { email });
   return { statusCode: 200, body: JSON.stringify({ message: 'Subscribed' }) };
 };
