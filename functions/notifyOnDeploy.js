@@ -17,7 +17,7 @@ const db = getFirestore(app);
 
 exports.handler = async (event) => {
   try {
-    const today = new Date().toISOString().split('T')[0]; // e.g., "2025-03-25"
+    const today = new Date().toISOString().split('T')[0];
     console.log('Checking articles for date:', today);
 
     const articlesQuery = query(

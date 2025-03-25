@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roy Collection</title>
+    <title>The Roy Collection</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; color: #333; line-height: 1.6; }
@@ -11,20 +11,17 @@
         nav { background-color: #34495e; padding: 1rem; text-align: center; }
         nav a { color: #ecf0f1; text-decoration: none; margin: 0 1.5rem; font-size: 1.1rem; transition: color 0.3s ease, transform 0.2s ease; }
         nav a:hover { color: #e74c3c; transform: scale(1.1); }
-        .content { max-width: 800px; margin: 2rem auto; padding: 0 1rem; text-align: center; } /* Center title */
-        .content h2 { color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 1rem; } /* Style title */
+        .content { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .content h2 { text-align: center; } /* Added this line */
+        footer { text-align: center; padding: 1.5rem; background-color: #2c3e50; color: #ecf0f1; font-size: 0.9rem; width: 100%; }
         .subscription { text-align: center; margin: 2rem auto; }
         .subscription h3 { color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 1rem; }
         .subscription input { padding: 0.5rem; font-size: 1rem; width: 200px; }
         .subscription button { padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; cursor: pointer; }
-        footer { text-align: center; padding: 1.5rem; background-color: #2c3e50; color: #ecf0f1; font-size: 0.9rem; width: 100%; }
-        .articles { margin-top: 2rem; }
-        .article { border-bottom: 1px solid #ddd; padding: 1rem 0; }
-        .article h3 { color: #2c3e50; }
     </style>
 </head>
 <body>
-    <header>Roy Collection</header>
+    <header>The Roy Collection</header>
     <nav>
         <a href="/">Home</a>
         <a href="/economic.html">Economic Perspective</a>
@@ -34,7 +31,6 @@
     <section class="content">
         <h2>Welcome to The Roy Collection</h2>
         <p>A space where thought-provoking ideas, fresh economic perspectives, and the latest in tech knowledge come together. Here, we explore the questions that shape our world—from the way we think about the economy to the technologies transforming our lives. Whether you're seeking to understand the forces driving change or just looking for something new to spark your curiosity, you're in the right place. Join me on a journey of discovery, and let's dive into the conversations that matter.</p>
-        <div class="articles" id="articleList"></div>
     </section>
     <div class="subscription">
         <h3>Get Updates</h3>
@@ -45,8 +41,7 @@
     </div>
     <footer>© 2025 Roy Collection. All rights reserved.</footer>
     <script>
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
-        const category = 'home';
+        const apiBase = window.location.hostname === 'localhost' ? '' : '';
 
         document.getElementById('subscribeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -64,30 +59,6 @@
                 alert('Failed to subscribe: ' + error.message);
             }
         });
-
-        async function loadArticles() {
-            try {
-                const response = await fetch(`${apiBase}/.netlify/functions/getArticles`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ category })
-                });
-                const articles = await response.json();
-                const articleList = document.getElementById('articleList');
-
-                articleList.innerHTML = '';
-                articles.forEach(article => {
-                    const div = document.createElement('div');
-                    div.className = 'article';
-                    div.innerHTML = `<h3>${article.title}</h3><p>${article.content}</p><small>${article.date}</small>`;
-                    articleList.appendChild(div);
-                });
-            } catch (error) {
-                console.error('Error loading articles:', error);
-            }
-        }
-
-        loadArticles();
     </script>
 </body>
 </html>
