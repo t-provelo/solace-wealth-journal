@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 exports.handler = async (event) => {
   try {
     console.log('Notify event body:', event.body);
-    const { subscribers, title, content } = JSON.parse(event.body);
+    const { subscribers } = JSON.parse(event.body);
 
     if (!subscribers || subscribers.length === 0) {
       throw new Error('No subscribers provided');
@@ -19,8 +19,8 @@ exports.handler = async (event) => {
 
     const mailOptions = {
       from: 'terryroy@theroycollection.com',
-      subject: `New Article: ${title}`,
-      text: `Hey there,\n\nI just posted a new article: "${title}"\n\n${content}\n\nCheck it out: https://theroycollection.com\n\nThanks for subscribing!\nTerry Roy`
+      subject: 'New Reads from The Roy Collection',
+      text: 'Expand your mind with todays read! Check out: https://theroycollection.com\n\nThank you for subscribing\n\nTerry Roy'
     };
 
     const sendPromises = subscribers.map(subscriber => 
