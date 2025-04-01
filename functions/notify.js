@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     const mailOptions = {
       from: 'terryroy@theroycollection.com',
       subject: 'New Reads from The Roy Collection',
-      text: 'Expand your mind with todays read! Check out: https://theroycollection.com\n\nThank you for subscribing\n\nTerry Roy'
+      text: 'Expand your mind with todays read! Check out: https://theroycollection.com\n\nThank you for subscribing!\n\nTerry Roy'
     };
 
     const sendPromises = subscribers.map(subscriber => 
