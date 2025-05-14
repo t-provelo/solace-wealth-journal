@@ -1,37 +1,43 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, addDoc } = require('firebase/firestore');
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDCgmDCNY4VOnZyKdZQGvfnTlULzcBRMXU",
-  authDomain: "roy-collection-6d136.firebaseapp.com",
-  projectId: "roy-collection-6d136",
-  storageBucket: "roy-collection-6d136.firebasestorage.app",
-  messagingSenderId: "539781423883",
-  appId: "1:539781423883:web:2d67d4dcc1cc0d94a9780e",
-  measurementId: "G-HNHC911W9D"
-};
+// Initialize Firebase Admin
+admin.initializeApp();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = admin.firestore();
 
 exports.handler = async (event) => {
   try {
-    console.log('Raw event body:', event.body);
-    const { title, content, date, category, archiveOld = false } = JSON.parse(event.body);
-    console.log('Parsed content:', content);
+    // Parse request body
+    const { title, content, date, category, archived } = JSON.parse(event.body);
 
-    const validCategories = ['home', 'economic', 'growth', 'tech'];
-    if (!validCategories.includes(category)) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid category' }) };
+    // Validate input
+    if (!title || !content || !date || !category) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing required fields' }),
+      };
     }
 
-    const docRef = await addDoc(collection(db, 'articles'), { title, content, date, category, archived: false });
-    console.log('Added article ID:', docRef.id);
+    // Add article to Firestore
+    const articleRef = await db.collection('articles').add({
+      title,
+      content,
+      date,
+      category,
+      archived: archived || false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-    // Notifications removed from here - will handle separately on deploy
-    return { statusCode: 200, body: JSON.stringify({ message: 'Article added' }) };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Article added successfully', id: articleRef.id }),
+    };
   } catch (error) {
-    console.error('Error:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    console.error('Error adding article:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };
